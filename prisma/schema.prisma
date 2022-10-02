@@ -10,9 +10,9 @@ datasource db {
 model Post {
   id          String    @id
   title       String
-  thumbnail   String
+  thumbnail   String?
   createdAt   DateTime  @default(now())
-  isPublished Boolean
+  isPublished Boolean  @default(false)
   content     String
   authorId    Int
   author      User      @relation(fields: [authorId], references: [id])
@@ -30,7 +30,7 @@ model Comment {
   parrentId Int?
   parent    Comment?  @relation("ParentChild", fields: [parrentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("ParentChild")
-  Upvote    Upvote[]
+  upvotes    Upvote[]
 }
 
 model Upvote {
@@ -49,8 +49,8 @@ model User {
   email        String    @unique
   refreshToken String?   @unique
   password     String
+
   posts        Post[]
   comments     Comment[]
-
-  Upvote Upvote[]
+  upvotes      Upvote[]
 }
