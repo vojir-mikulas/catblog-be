@@ -5,8 +5,6 @@ export class CreatePostDto{
   @IsNotEmpty()
   title: string
   @IsOptional()
-  thumbnail?: string
-  @IsOptional()
   isPublished?: boolean
   @IsString()
   @IsNotEmpty()

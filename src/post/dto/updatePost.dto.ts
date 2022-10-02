@@ -5,7 +5,8 @@ export class UpdatePostDto{
   @IsOptional()
   title?: string
   @IsOptional()
-  thumbnail?: string
+  @IsString()
+  filename?: string
   @IsOptional()
   isPublished?: boolean
   @IsString()

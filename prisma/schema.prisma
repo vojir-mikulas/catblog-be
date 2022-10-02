@@ -49,6 +49,7 @@ model User {
   email        String    @unique
   refreshToken String?   @unique
   password     String
+  avatar       String?
 
   posts        Post[]
   comments     Comment[]
