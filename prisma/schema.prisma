@@ -20,22 +20,37 @@ model Post {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
   content   String
   postId    String
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parrentId Int?
+  parent    Comment?  @relation("ParentChild", fields: [parrentId], references: [id], onDelete: Cascade)
+  children  Comment[] @relation("ParentChild")
+  Upvote    Upvote[]
 }
 
-model CommentUpvote {
-  id Int @id @default(autoincrement())
+model Upvote {
+  user      User    @relation(fields: [userId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id])
+  userId    Int
+  commentId Int
+
+  @@id([userId, commentId])
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
-  surname  String
-  posts    Post[]
+  id           Int       @id @default(autoincrement())
+  name         String
+  surname      String
+  email        String    @unique
+  refreshToken String?   @unique
+  password     String
+  posts        Post[]
+  comments     Comment[]
+
+  Upvote Upvote[]
 }

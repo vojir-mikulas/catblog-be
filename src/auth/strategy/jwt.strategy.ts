@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy){
   constructor(private config: ConfigService, private prisma: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get('JWT_SECRET_KEY')
+      secretOrKey: config.get('JWT_ACCESS_SECRET')
     });
   }
   async validate(payload: { sub:number, email: string }) {

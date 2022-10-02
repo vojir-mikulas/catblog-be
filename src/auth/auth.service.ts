@@ -6,7 +6,6 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { LoginDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { access } from "fs";
 
 @Injectable()
 export class AuthService {
@@ -47,21 +46,60 @@ export class AuthService {
     let pwIsCorrrect = await argon.verify(user.password, dto.password);
     if (!pwIsCorrrect) throw new ForbiddenException("Email address or password incorrect");
 
-    return this.signToken(user.id, user.email)
+    return this.signToken(user.id, user.email);
   }
 
-  async signToken(userId: number, email: string) : Promise<{access_token: string}>{
+  async signToken(userId: number, email: string): Promise<{ access_token: string, refresh_token: string }> {
     const data = {
       sub: userId,
       email
     };
 
-    let token = await this.jwt.signAsync(data, {
-      expiresIn: "20m",
-      secret: this.config.get('JWT_SECRET_KEY')
+    let access_token = await this.jwt.signAsync(data, {
+      expiresIn: this.config.get("JWT_ACCESS_EXP"),
+      secret: this.config.get("JWT_ACCESS_SECRET")
+    });
+    let refresh_token = await this.jwt.signAsync(data, {
+      expiresIn: this.config.get("JWT_REFRESH_EXP"),
+      secret: this.config.get("JWT_REFRESH_SECRET")
+    });
+
+    await this.prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        // @ts-ignore
+        refreshToken: refresh_token
+      }
+    });
+
+    return {
+      access_token,
+      refresh_token
+    };
+  }
+
+  async refreshAccessToken(refresh_token: string) : Promise<{ access_token: string}> {
+    try{
+      this.jwt.verify(refresh_token, {secret: this.config.get("JWT_REFRESH_SECRET")})
+    }catch(error){
+      throw new ForbiddenException("Invalid refresh token");
+    }
+    const decodedJwtAccessToken =  this.jwt.decode(refresh_token);
+    const user = await this.prisma.user.findUnique({ where: { id: decodedJwtAccessToken.sub} });
+    if(user.refreshToken !== refresh_token) throw new ForbiddenException("Invalid refresh token");
+
+    const data = {
+      sub: user.id,
+      email: user.email
+    };
+    let access_token = await this.jwt.signAsync(data, {
+      expiresIn: this.config.get("JWT_ACCESS_EXP"),
+      secret: this.config.get("JWT_ACCESS_SECRET")
     });
     return {
-      access_token: token
+      access_token
     }
   }
 }
