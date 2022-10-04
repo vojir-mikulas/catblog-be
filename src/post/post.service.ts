@@ -11,7 +11,7 @@ export class PostService {
 
   async getAllPosts() {
     return await this.prisma.post.findMany({
-      where: {
+      where: { 
 
       }
     });
@@ -107,6 +107,7 @@ export class PostService {
     });
 
     if (!post || post.authorId !== userId) throw new ForbiddenException("Access to resources denied.");
+    if(!post.thumbnail) return
     const filename = post.thumbnail.split("/")[3];
     const path = `./public/thumbnails/${filename}.jpg`
       fs.unlink(path, function(err) { if (err) return console.log(err); console.log("File deleted successfully"); });

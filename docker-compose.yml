@@ -10,5 +10,15 @@ services:
       POSTGRES_DB: db_blog
     networks:
       - backend
+  blogDb-test:
+    image: postgres:13
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: db_blog
+    networks:
+      - backend
 networks:
   backend:

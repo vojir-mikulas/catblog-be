@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, NotFoundException,
   Param,
   Post,
   Put,
@@ -37,8 +37,10 @@ export class PostController {
 
   //PUBLIC
   @Get(":id")
-  getPostById(@Param("id") postId: string) {
-    return this.postService.getPostsById(postId);
+  async getPostById(@Param("id") postId: string) {
+    const post = await this.postService.getPostsById(postId);
+     if(!post) throw new NotFoundException()
+    return post
   }
 
 
@@ -57,7 +59,8 @@ export class PostController {
   }))
   createPost(@GetUser("id") userId: number, @Body() dto: CreatePostDto, @UploadedFile() file: Express.Multer.File) {
     const postId: string = this.convertToSlugID(dto.title);
-    const filepath: string = `${file.destination.substring(1)}/${file.filename}`;
+    let filepath: string;
+    if(file) filepath = `${file.destination.substring(1)}/${file.filename}`;
     return this.postService.createPost(postId, userId, dto, filepath);
   }
 
@@ -70,18 +73,26 @@ export class PostController {
       filename(req: Request, file: Express.Multer.File, callback: (error: (Error | null), filename: string) => void) {
 
         let filename = undefined;
-        if(!req.body['filename'])  return
+        // TODO: fix the req.body issue
+        // req.body is always [Object: null prototype] not containing the needed filename for replacing thumbnail file
+        if(!req.body['filename']) {
+          filename = `${uuid()}.jpg`;
+        }
+        else {
+          filename = `${req.body["filename"]}`;
+        }
 
-        filename = `${req.body["filename"]}`;
         callback(null, filename);
       }
     })
   }))
   updatePost(@GetUser("id") userId: number, @Param("id") postId: string, @Body() dto: UpdatePostDto, @UploadedFile() file: Express.Multer.File) {
     let filepath: string = null;
+    console.log(dto)
     if(file) {
        filepath = `${file.destination.substring(1)}/${file.filename}`;
     }
+    dto.isPublished = Boolean(dto.isPublished);
     return this.postService.updatePost(userId, postId, dto, filepath);
   }
 
@@ -92,6 +103,7 @@ export class PostController {
     await this.postService.removeThumbnailFile(userId,postId)
     return this.postService.deletePost(userId, postId);
   }
+
   @UseGuards(AuthGuard("jwt"))
   @Delete("tumbnail/:id")
   async deletePostTumbnail(@GetUser("id") userId: number, @Param("id") postId: string){

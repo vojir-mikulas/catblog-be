@@ -1,6 +1,7 @@
 import { Injectable, UploadedFile } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { GetUser } from "../auth/decorator";
+import { UpdateUserDto } from "./dto/updateUser.dto";
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,16 @@ export class UserService {
     })
   }
 
+  async updateUser(userId:number, dto: UpdateUserDto){
+  await this.prisma.user.update({
+      where:{
+        id:userId
+      },
+    data:{
+        ...dto
+    }
+    })
+  }
   async uploadAvatar( userId: number, file: Express.Multer.File){
     await this.prisma.user.update({
     where:{

@@ -2,9 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, NotFoundException,
   Param,
-  Post,
+  Post, Put,
   Req,
   UploadedFile,
   UseGuards,
@@ -17,8 +17,8 @@ import { UserService } from "./user.service";
 import { FileInterceptor, MulterModule } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { Request } from "express";
-import { v4 as uuid } from "uuid";
 import * as fs from "fs";
+import { UpdateUserDto } from "./dto/updateUser.dto";
 
 @Controller("users")
 export class UserController {
@@ -31,6 +31,13 @@ export class UserController {
   getMyAccount(@GetUser() user: User) {
     return user;
   }
+  //TODO: edit user profile
+  @UseGuards(AuthGuard("jwt"))
+  @Put()
+  updateUser(@GetUser("id") userId: number, @Body() dto: UpdateUserDto){
+  return this.userService.updateUser(userId,dto)
+  }
+
 
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
@@ -42,8 +49,11 @@ export class UserController {
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Get("posts/:id")
-  getUsersPostById(@GetUser("id") userId: number, @Param("id") postId: string) {
-    return this.userService.getUsersPostById(userId, postId);
+  async getUsersPostById(@GetUser("id") userId: number, @Param("id") postId: string) {
+    const post = await this.userService.getUsersPostById(userId, postId);
+
+    if(!post) throw new NotFoundException()
+    return post
   }
 
   // USER AVATAR
@@ -69,5 +79,6 @@ export class UserController {
       if(err) return console.log(err);
       console.log('File deleted successfully');
     })
+    return this.userService.deleteAvatar(userId);
   }
 }

@@ -43,8 +43,8 @@ export class AuthService {
     });
     if (!user) throw new ForbiddenException("Email address or password incorrect");
 
-    let pwIsCorrrect = await argon.verify(user.password, dto.password);
-    if (!pwIsCorrrect) throw new ForbiddenException("Email address or password incorrect");
+    let pwIsCorrect = await argon.verify(user.password, dto.password);
+    if (!pwIsCorrect) throw new ForbiddenException("Email address or password incorrect");
 
     return this.signToken(user.id, user.email);
   }
