@@ -36,7 +36,7 @@ describe("CatBlog", () => {
   });
 
   describe("Auth", () => {
-    describe("register", () => {
+    describe("Register", () => {
       it("should throw an error if some of user credentials are empty or wrong", () => {
         const badDto = {
           surname: "Vomáčka",
@@ -61,7 +61,7 @@ describe("CatBlog", () => {
         return pactum.spec().post("/auth/register").withBody(dto).expectStatus(201);
       });
     });
-    describe("login", () => {
+    describe("Login", () => {
       it("should throw error if email or password is wrong", () => {
         const badDto: LoginDto = {
           email: "test@gmail.com",
@@ -83,15 +83,15 @@ describe("CatBlog", () => {
         return pactum.spec().post("http://localhost:3333/auth/login").withBody(dto).expectStatus(200).stores("userAccessToken", "access_token").stores("userRefreshToken", "refresh_token");
       });
     });
-    describe("get new access token", () => {
-      it("should throw error if no refresh token is provided or is expired", () => {
-        return pactum.spec().post("http://localhost:3333/auth/token").withBody({
-          refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoidm9qaXJAc2QuY3oiLCJpYXQiOjE2NjQ3OTY4NTUsImV4cCI6MTY2NDc5ODA1NX0.dyFP2TyOEfdi8xTO9r7DGneoejEX3Qun3NKsPIU_kWM"
-        }).expectStatus(403);
+    describe("Get new access token", () => {
+      it("should throw 401 Unauthorized if no refresh token is provided or is expired", () => {
+        return pactum.spec().post("http://localhost:3333/auth/token").withHeaders({
+          Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImVtYWlsIjoidm9qaXJAc2QuY3oiLCJpYXQiOjE2NjQ3OTY4NTUsImV4cCI6MTY2NDc5ODA1NX0.dyFP2TyOEfdi8xTO9r7DGneoejEX3Qun3NKsPIU_kWM"
+        }).expectStatus(401);
       });
       it("should retrieve access token with refresh token", () => {
-        return pactum.spec().post("http://localhost:3333/auth/token").withBody({
-          refreshToken: "$S{userRefreshToken}"
+        return pactum.spec().post("http://localhost:3333/auth/token").withHeaders({
+          Authorization: "Bearer $S{userRefreshToken}"
         }).expectStatus(200);
       });
     });

@@ -28,8 +28,6 @@ export class PostService {
 
 
   async createPost(postId: string, userId: number, dto: CreatePostDto, thumbnailUrl?: string) {
-    //TODO: add uuid to slug
-
     try {
       return await this.prisma.post.create({
         data: {

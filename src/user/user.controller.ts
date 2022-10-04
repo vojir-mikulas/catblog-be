@@ -31,7 +31,7 @@ export class UserController {
   getMyAccount(@GetUser() user: User) {
     return user;
   }
-  //TODO: edit user profile
+
   @UseGuards(AuthGuard("jwt"))
   @Put()
   updateUser(@GetUser("id") userId: number, @Body() dto: UpdateUserDto){
