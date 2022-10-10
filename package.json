@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "compose:up": "docker compose up  blogDb -d && docker compose up  catblog-be -d",
     "db:up": "docker compose up  blogDb -d",
     "db:rm": "docker compose rm blogDb -s -f -v ",
     "db:test:up": "docker compose up  blogDb-test -d",

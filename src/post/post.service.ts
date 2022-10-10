@@ -1,7 +1,7 @@
 import { Body, ForbiddenException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreatePostDto, UpdatePostDto } from "./dto";
-import * as fs from 'fs';
+import * as fs from "fs";
 
 @Injectable()
 export class PostService {
@@ -11,8 +11,25 @@ export class PostService {
 
   async getAllPosts() {
     return await this.prisma.post.findMany({
-      where: { 
-
+      where: {},
+      select: {
+        id: true,
+        title: true,
+        thumbnail: true,
+        createdAt: true,
+        content: true,
+        isPublished: true,
+        author: {
+          select: {
+            name: true,
+            surname: true,
+            avatar: true
+          }
+        },
+        comments: true
+      },
+      orderBy: {
+        createdAt: "desc"
       }
     });
   }
@@ -20,15 +37,34 @@ export class PostService {
   async getPostsById(postId: string) {
     return await this.prisma.post.findFirst({
       where: {
-        id: postId,
-        isPublished: true
+        id: postId
+        //isPublished: true
+      },
+      select: {
+        id: true,
+        title: true,
+        thumbnail: true,
+        createdAt: true,
+        content: true,
+        isPublished: true,
+        author: {
+          select: {
+            name: true,
+            surname: true,
+            avatar: true
+          }
+        },
+        comments: true
       }
     });
   }
 
 
   async createPost(postId: string, userId: number, dto: CreatePostDto, thumbnailUrl?: string) {
+
     try {
+      if(dto.isPublished) dto.isPublished = Boolean(dto.isPublished)
+
       return await this.prisma.post.create({
         data: {
           id: postId,
@@ -58,7 +94,7 @@ export class PostService {
         thumbnail: thumbnailUrl,
         title: dto.title,
         content: dto.content,
-        isPublished: dto.isPublished,
+        isPublished: dto.isPublished
 
       }
     });
@@ -97,7 +133,7 @@ export class PostService {
     });
   }
 
-  async removeThumbnailFile( userId: number,postId: string) {
+  async removeThumbnailFile(userId: number, postId: string) {
     const post = await this.prisma.post.findUnique({
       where: {
         id: postId
@@ -105,9 +141,12 @@ export class PostService {
     });
 
     if (!post || post.authorId !== userId) throw new ForbiddenException("Access to resources denied.");
-    if(!post.thumbnail) return
+    if (!post.thumbnail) return;
     const filename = post.thumbnail.split("/")[3];
-    const path = `./public/thumbnails/${filename}.jpg`
-      fs.unlink(path, function(err) { if (err) return console.log(err); console.log("File deleted successfully"); });
+    const path = `./public/thumbnails/${filename}.jpg`;
+    fs.unlink(path, function(err) {
+      if (err) return console.log(err);
+      console.log("File deleted successfully");
+    });
   }
 }

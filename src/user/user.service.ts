@@ -12,6 +12,25 @@ export class UserService {
       {
         where: {
           authorId: userId
+        },
+        orderBy:{
+          createdAt: 'desc'
+        },
+        select: {
+          id: true,
+          title: true,
+          thumbnail: true,
+          createdAt: true,
+          content: true,
+          isPublished: true,
+          author: {
+            select: {
+              name: true,
+              surname: true,
+              avatar: true
+            }
+          },
+          comments: true
         }
       }
     );
@@ -22,6 +41,22 @@ export class UserService {
       where:{
         id: postId,
         authorId: userId
+      },
+      select: {
+        id: true,
+        title: true,
+        thumbnail: true,
+        createdAt: true,
+        content: true,
+        isPublished: true,
+        author: {
+          select: {
+            name: true,
+            surname: true,
+            avatar: true
+          }
+        },
+        comments: true
       }
     })
   }

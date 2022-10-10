@@ -11,7 +11,6 @@ import {
   UseInterceptors
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { User } from "@prisma/client";
 import { GetUser } from "../auth/decorator";
 import { UserService } from "./user.service";
 import { FileInterceptor, MulterModule } from "@nestjs/platform-express";
@@ -19,6 +18,17 @@ import { diskStorage } from "multer";
 import { Request } from "express";
 import * as fs from "fs";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+
+type User = {
+  id: number
+  name: string
+  surname: string
+  email: string
+  refreshToken: string | null
+  password: string
+  avatar: string | null
+}
+
 
 @Controller("users")
 export class UserController {
