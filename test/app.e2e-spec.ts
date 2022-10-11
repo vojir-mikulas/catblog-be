@@ -114,10 +114,18 @@ describe("CatBlog", () => {
     describe("Update post", () => {
       it("should update post that user have access to", () => {
         return pactum.spec().put("/posts/{id}").withPathParams("id", "$S{postId}").withBody({
-          isPublished: true
+          content: "Some dummy text"
         }).withHeaders({
           Authorization: "Bearer $S{userAccessToken}"
         }).expectStatus(200);
+      });
+
+      it("should throw 403 forbidden if user try to set post as Published but Post does not have proper thumbnail", () => {
+        return pactum.spec().put("/posts/{id}").withPathParams("id", "$S{postId}").withBody({
+          isPublished: true
+        }).withHeaders({
+          Authorization: "Bearer $S{userAccessToken}"
+        }).expectStatus(403);
       });
 
       it("should throw 401 unauthorized if the access token is invalid", () => {

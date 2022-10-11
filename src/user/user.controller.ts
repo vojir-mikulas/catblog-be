@@ -73,12 +73,14 @@ export class UserController {
     storage: diskStorage({
       destination: "./public/avatar",
       filename(req: Request, file: Express.Multer.File, callback: (error: (Error | null), filename: string) => void) {
+        console.log(file)
         const filename = `${req.user["id"]}.jpg`;
         callback(null, filename);
       }
     })
   }))
   uploadAvatar(@GetUser("id") userId: number, @UploadedFile() file: Express.Multer.File) {
+    console.log(file)
     return this.userService.uploadAvatar(userId, file);
   }
   //DELETE USER AVATAR

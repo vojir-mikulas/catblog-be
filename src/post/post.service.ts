@@ -11,7 +11,9 @@ export class PostService {
 
   async getAllPosts() {
     return await this.prisma.post.findMany({
-      where: {},
+      where: {
+        isPublished: true
+      },
       select: {
         id: true,
         title: true,
@@ -37,8 +39,8 @@ export class PostService {
   async getPostsById(postId: string) {
     return await this.prisma.post.findFirst({
       where: {
-        id: postId
-        //isPublished: true
+        id: postId,
+        isPublished: true
       },
       select: {
         id: true,
@@ -63,9 +65,10 @@ export class PostService {
   async createPost(postId: string, userId: number, dto: CreatePostDto, thumbnailUrl?: string) {
 
     try {
-      if(dto.isPublished) dto.isPublished = Boolean(dto.isPublished)
+      dto.isPublished = dto.isPublished === "true";
 
       return await this.prisma.post.create({
+        // @ts-ignore
         data: {
           id: postId,
           authorId: userId,
@@ -86,16 +89,18 @@ export class PostService {
     });
     if (!post || post.authorId !== userId) throw new ForbiddenException("Access to resources denied.");
 
+    let prevUrl = post.thumbnail ? post.thumbnail : undefined;
+    let url = thumbnailUrl ? thumbnailUrl : prevUrl;
+    if(dto.isPublished && !url) throw new ForbiddenException("Post must have an image before publishing.");
     return this.prisma.post.update({
       where: {
         id: postId
       },
       data: {
-        thumbnail: thumbnailUrl,
         title: dto.title,
         content: dto.content,
-        isPublished: dto.isPublished
-
+        isPublished: dto.isPublished,
+        thumbnail: url
       }
     });
   }
@@ -143,7 +148,7 @@ export class PostService {
     if (!post || post.authorId !== userId) throw new ForbiddenException("Access to resources denied.");
     if (!post.thumbnail) return;
     const filename = post.thumbnail.split("/")[3];
-    const path = `./public/thumbnails/${filename}.jpg`;
+    const path = `./public/thumbnails/${filename}`;
     fs.unlink(path, function(err) {
       if (err) return console.log(err);
       console.log("File deleted successfully");

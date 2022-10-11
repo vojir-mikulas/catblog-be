@@ -14,7 +14,7 @@ export class CreatePostDto{
     description: "Whetever is post published"
   })
   @IsOptional()
-  isPublished?: boolean
+  isPublished?: string | boolean
   @ApiProperty({
     type: String,
     description: "Content of post"
