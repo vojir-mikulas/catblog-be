@@ -27,8 +27,7 @@ export class PostService {
             surname: true,
             avatar: true
           }
-        },
-        comments: true
+        }
       },
       orderBy: {
         createdAt: "desc"
@@ -56,7 +55,15 @@ export class PostService {
             avatar: true
           }
         },
-        comments: true
+        comments: {
+          orderBy:{
+            createdAt:'desc'
+          },
+          include:{
+            user:true,
+
+          }
+        }
       }
     });
   }

@@ -7,10 +7,11 @@ import { PrismaModule } from "./prisma/prisma.module";
 import { AppController } from "./app.controller";
 import { join } from "path";
 import { ServeStaticModule } from "@nestjs/serve-static";
+import { CommentModule } from './comment/comment.module';
 
 
 @Module({
-  imports: [ ConfigModule.forRoot({ isGlobal: true }), AuthModule, UserModule, PostModule, PrismaModule],
+  imports: [ ConfigModule.forRoot({ isGlobal: true }), AuthModule, UserModule, PostModule, PrismaModule, CommentModule],
   controllers: [AppController]
 })
 export class AppModule {

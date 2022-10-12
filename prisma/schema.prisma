@@ -20,24 +20,25 @@ model Post {
 }
 
 model Comment {
-  id        Int       @id @default(autoincrement())
+  id        String       @id @default(uuid())
   createdAt DateTime  @default(now())
   content   String
   postId    String
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   userId    Int
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parrentId Int?
-  parent    Comment?  @relation("ParentChild", fields: [parrentId], references: [id], onDelete: Cascade)
+  parentId String?
+  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("ParentChild")
   upvotes    Upvote[]
 }
 
 model Upvote {
   user      User    @relation(fields: [userId], references: [id])
-  comment   Comment @relation(fields: [commentId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   userId    Int
-  commentId Int
+  commentId String
+  value     Int     @default(1)
 
   @@id([userId, commentId])
 }
@@ -55,3 +56,4 @@ model User {
   comments     Comment[]
   upvotes      Upvote[]
 }
+

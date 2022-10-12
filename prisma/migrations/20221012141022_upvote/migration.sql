@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Upvote" ADD COLUMN     "value" INTEGER NOT NULL DEFAULT 1;
