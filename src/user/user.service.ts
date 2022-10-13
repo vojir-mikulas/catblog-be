@@ -30,7 +30,11 @@ export class UserService {
               avatar: true
             }
           },
-          comments: true
+          _count: {
+            select:{
+              comments:true
+            }
+          }
         }
       }
     );

@@ -4,6 +4,7 @@ import { BadRequestException, Body, ForbiddenException, UseGuards } from "@nestj
 import { AuthGuard } from "@nestjs/passport";
 import { GetUser } from "../auth/decorator";
 import { CommentService } from "./comment.service";
+import { WsGuard } from "../auth/guard/ws.guard";
 
 @WebSocketGateway(3002,{cors:'*'})
 export class CommentGateway{
@@ -13,22 +14,22 @@ export class CommentGateway{
   @WebSocketServer()
   server;
 
-
+  @UseGuards(WsGuard)
   @SubscribeMessage('comment')
-  async handleComment(@Body() dto :any){
-    console.log(dto)
+  async handleComment(@Body() dto:any){
+
     if(dto.method === 'delete'){
       if(!dto || !dto.id) throw new WsException('Invalid credentials.');
-      await this.commentService.deleteComment(1, dto)
+      await this.commentService.deleteComment(dto.user.id, dto)
       const allComments = await this.commentService.getAllRelatedComments(dto)
       this.server.emit('comment',allComments)
     }else if(dto.method === 'post'){
       if(!dto || !dto.content) throw new WsException('Invalid credentials.');
-      await this.commentService.createComment(1, dto)
+      await this.commentService.createComment(dto.user.id, dto)
       const allComments = await this.commentService.getAllRelatedComments(dto)
       this.server.emit('comment',allComments)
     } else if (dto.method === 'put'){
-      await this.commentService.Upvote(1,dto)
+      await this.commentService.Upvote(dto.user.id,dto)
       const allComments = await this.commentService.getAllRelatedComments(dto)
       this.server.emit('comment',allComments)
     }

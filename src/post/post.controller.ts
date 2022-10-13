@@ -91,11 +91,11 @@ export class PostController {
   }))
   updatePost(@GetUser("id") userId: number, @Param("id") postId: string, @Body() dto: UpdatePostDto, @UploadedFile() file: Express.Multer.File) {
     let filepath: string = null;
-
+    console.log(dto);
     if(file) {
        filepath = `${file.destination.substring(1)}/${file.filename}`;
     }
-    dto.isPublished = Boolean(dto.isPublished);
+    dto.isPublished = dto.isPublished === "true";
 
     return this.postService.updatePost(userId, postId, dto, filepath);
   }

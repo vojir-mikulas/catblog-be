@@ -28,7 +28,7 @@ export class UpdatePostDto{
     description: "If is post published"
   })
   @IsOptional()
-  isPublished?: boolean
+  isPublished?: string | boolean
 
   @ApiProperty({
     type: String,

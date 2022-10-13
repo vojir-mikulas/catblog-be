@@ -38,7 +38,7 @@ export class CommentService {
           comment.upvotes = upvote._sum.value;
         }
       });
-      console.log(comment)
+
       return comment;
     });
 

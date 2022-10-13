@@ -27,6 +27,11 @@ export class PostService {
             surname: true,
             avatar: true
           }
+        },
+        _count: {
+          select:{
+            comments:true
+          }
         }
       },
       orderBy: {
@@ -36,7 +41,18 @@ export class PostService {
   }
 
   async getPostsById(postId: string) {
-    return await this.prisma.post.findFirst({
+
+    // @ts-ignore
+    const upvotes: Array<any> = await this.prisma.upvote.groupBy({
+      by: ["commentId"],
+      _sum: {
+        // @ts-ignore
+        value: true
+      }
+
+    });
+
+    const post: any = await this.prisma.post.findFirst({
       where: {
         id: postId,
         isPublished: true
@@ -56,18 +72,30 @@ export class PostService {
           }
         },
         comments: {
-          orderBy:{
-            createdAt:'desc'
+          orderBy: {
+            createdAt: "desc"
           },
-          include:{
-            user:true,
+          include: {
+            user: true
 
           }
         }
       }
     });
-  }
 
+
+    post.comments = post?.comments.map((comment: any) => {
+      comment.upvotes = 0;
+      upvotes.forEach((upvote: any) => {
+        if (comment.id === upvote.commentId) {
+          comment.upvotes = upvote._sum.value;
+        }
+      });
+      return comment;
+    });
+    return post;
+
+  }
 
   async createPost(postId: string, userId: number, dto: CreatePostDto, thumbnailUrl?: string) {
 
@@ -98,7 +126,7 @@ export class PostService {
 
     let prevUrl = post.thumbnail ? post.thumbnail : undefined;
     let url = thumbnailUrl ? thumbnailUrl : prevUrl;
-    if(dto.isPublished && !url) throw new ForbiddenException("Post must have an image before publishing.");
+    if (dto.isPublished === true && !url) throw new ForbiddenException("Post must have an image before publishing.");
     return this.prisma.post.update({
       where: {
         id: postId
@@ -106,6 +134,7 @@ export class PostService {
       data: {
         title: dto.title,
         content: dto.content,
+        // @ts-ignore
         isPublished: dto.isPublished,
         thumbnail: url
       }
