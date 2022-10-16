@@ -16,9 +16,9 @@ RUN npm install
 # COPY
 COPY . .
 
-ENV PORT=8080
-ENV DATABASE_URL="0.0.0.0:5432"
-EXPOSE 8080
+
+
+EXPOSE 3000
 
 
 CMD ["npm", "start"]

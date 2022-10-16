@@ -44,7 +44,6 @@ export class PostController {
     return post
   }
 
-
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Post()
@@ -75,9 +74,7 @@ export class PostController {
       filename(req: Request, file: Express.Multer.File, callback: (error: (Error | null), filename: string) => void) {
 
         let filename = undefined;
-        // TODO: fix the req.body issue
         // req.body is always [Object: null prototype] not containing the needed filename for replacing thumbnail file
-
         if(!req.body['filename']) {
           filename = `${uuid()}.jpg`;
         }

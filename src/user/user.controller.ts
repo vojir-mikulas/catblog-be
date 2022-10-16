@@ -73,7 +73,6 @@ export class UserController {
     storage: diskStorage({
       destination: "./public/avatar",
       filename(req: Request, file: Express.Multer.File, callback: (error: (Error | null), filename: string) => void) {
-        console.log(file)
         const filename = `${req.user["id"]}.jpg`;
         callback(null, filename);
       }
