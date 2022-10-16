@@ -6,7 +6,7 @@ import { GetUser } from "../auth/decorator";
 import { CommentService } from "./comment.service";
 import { WsGuard } from "../auth/guard/ws.guard";
 
-@WebSocketGateway(3002, { cors: "*" })
+@WebSocketGateway(3001, { cors: "*" })
 export class CommentGateway {
   constructor(private commentService: CommentService) {
   }

@@ -24,6 +24,7 @@ services:
     image: catblog-be
     ports:
       - 3000:3000
+      - 3001:3002
     environment:
       DATABASE_URL: "postgresql://postgres:123@172.24.0.2:5432/db_blog?schema=public"
       JWT_ACCESS_SECRET: 'slanáhoustička500ghladkémouky.250mlvlažnéhomléka.1/2kostkydroždí(cca20g)2lžícesádla.2lžičkysoli.špetkacukru.1vejcenapotřeníhrubásůl,kmín,mák,semínkanaposypání'
@@ -36,10 +37,10 @@ services:
   catblog-fe:
     image: catblog-fe
     ports:
-      - 3001:3001
+      - 3002:3000
     environment:
       REACT_APP_BASEURL: 'http://172.18.0.2:3000'
-      REACT_APP_COMMENT_WS_URL: 'http:http://172.18.0.2:3002'
+      REACT_APP_COMMENT_WS_URL: 'http://172.18.0.2:3001'
     networks:
         - frontend
 networks:
