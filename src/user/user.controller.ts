@@ -18,6 +18,7 @@ import { diskStorage } from "multer";
 import { Request } from "express";
 import * as fs from "fs";
 import { UpdateUserDto } from "./dto/updateUser.dto";
+import { ApiOperation } from "@nestjs/swagger";
 
 type User = {
   id: number
@@ -35,6 +36,7 @@ export class UserController {
   constructor(private userService: UserService) {
   }
 
+  @ApiOperation({description: "Current user verified with token"})
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Get("me")
@@ -42,6 +44,7 @@ export class UserController {
     return user;
   }
 
+  @ApiOperation({description: "Edit user credentials / upload avatar"})
   @UseGuards(AuthGuard("jwt"))
   @Put()
   updateUser(@GetUser("id") userId: number, @Body() dto: UpdateUserDto){
@@ -49,6 +52,7 @@ export class UserController {
   }
 
 
+  @ApiOperation({description: "Get all users posts"})
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Get("posts")
@@ -56,6 +60,8 @@ export class UserController {
     return this.userService.getAllUsersPosts(userId);
   }
 
+
+  @ApiOperation({description: "Get single users post by id"})
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Get("posts/:id")
@@ -66,6 +72,7 @@ export class UserController {
     return post
   }
 
+  @ApiOperation({description: "Upload user avatar"})
   // USER AVATAR
   @UseGuards(AuthGuard("jwt"))
   @Post("avatar")
@@ -82,6 +89,8 @@ export class UserController {
     console.log(file)
     return this.userService.uploadAvatar(userId, file);
   }
+
+  @ApiOperation({description: "Delete user avatar"})
   //DELETE USER AVATAR
   @UseGuards(AuthGuard("jwt"))
   @Delete("avatar")

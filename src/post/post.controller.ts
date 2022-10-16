@@ -19,6 +19,9 @@ import { diskStorage } from "multer";
 import { Request } from "express";
 import { PrismaService } from "../prisma/prisma.service";
 import {v4 as uuid} from 'uuid'
+import { ApiBody, ApiOperation } from "@nestjs/swagger";
+import { LoginDto } from "../auth/dto/login.dto";
+import { AuthDto } from "../auth/dto";
 
 @Controller("posts")
 export class PostController {
@@ -29,12 +32,14 @@ export class PostController {
     return title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-").toLowerCase() + uuid();
   }
 
+  @ApiOperation({description: "Get all posts"})
   //PUBLIC
   @Get()
   getAllPosts() {
     return this.postService.getAllPosts();
   }
 
+  @ApiOperation({description: "Get post by id"})
   //PUBLIC
   @Get(":id")
   async getPostById(@Param("id") postId: string) {
@@ -44,6 +49,20 @@ export class PostController {
     return post
   }
 
+  @ApiOperation({description: "Create post"})
+  @ApiBody({
+    type: CreatePostDto,
+    examples: {
+      a: {
+        summary: "Create post body #1",
+        value: {
+          title: 'Some very nice title',
+          content: 'content about cats'
+        } as CreatePostDto
+      },
+    }
+
+  })
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Post()

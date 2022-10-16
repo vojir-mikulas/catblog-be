@@ -43,12 +43,38 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  @ApiOperation({description: "The user login endpoint"})
+  @ApiBody({
+    type: LoginDto,
+    examples: {
+      a: {
+        summary: "Login body #1",
+        value: {
+          email: "tomas.vostarek@gmail.com",
+          password: "123"
+        } as LoginDto
+      },
+      b: {
+        summary: "Login body #2",
+        value: {
+          email: "libor.fiala@gmail.com",
+          password: "123"
+        } as LoginDto
+      }
+    }
+
+  })
   @Post("login")
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
+
+  @ApiOperation({description: "Refresh access token endpoint"})
+  @ApiBody({
+    type: TokenDto,
+  })
   @UseGuards(AuthGuard("jwt-refresh"))
   @Post('token')
   @HttpCode(200)
