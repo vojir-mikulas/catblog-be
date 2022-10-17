@@ -84,6 +84,8 @@ export class PostController {
     return this.postService.createPost(postId, userId, dto, filepath);
   }
 
+
+  @ApiOperation({description: "Edit post"})
   //PROTECTED
   @UseGuards(AuthGuard("jwt"))
   @Put(":id")
