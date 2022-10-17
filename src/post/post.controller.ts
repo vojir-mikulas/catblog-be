@@ -29,7 +29,7 @@ export class PostController {
   }
 
   convertToSlugID(title: string): string {
-    return title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-").toLowerCase() + uuid();
+    return title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z ]/g, "").replace(/\s+/g, "-").toLowerCase() + uuid();
   }
 
   @ApiOperation({description: "Get all posts"})
